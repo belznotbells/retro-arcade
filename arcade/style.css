@@ -1,0 +1,228 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, #161b35 0%, #070816 40%, #000 100%);
+  color: white;
+  font-family: "Courier New", monospace;
+  padding: 30px 18px;
+}
+
+.arcade {
+  max-width: 1050px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.insert-coin {
+  color: #ffd84d;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  animation: blink 1.2s steps(2, start) infinite;
+}
+
+h1 {
+  margin: 10px 0 4px;
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  letter-spacing: 0.1em;
+  color: #7df9ff;
+  text-shadow:
+    0 0 8px #7df9ff,
+    0 0 18px #7df9ff,
+    0 0 35px #176b87;
+}
+
+.subtitle {
+  margin: 0;
+  color: #ff5fa2;
+  letter-spacing: 0.18em;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+  gap: 22px;
+}
+
+.game-card {
+  text-decoration: none;
+  color: white;
+  background: #0d1020;
+  border: 2px solid #343b60;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.game-card.playable:hover {
+  transform: translateY(-5px);
+  border-color: #7df9ff;
+  box-shadow:
+    0 0 12px rgba(125, 249, 255, 0.5),
+    0 0 30px rgba(125, 249, 255, 0.15);
+}
+
+.game-screen {
+  height: 175px;
+  background:
+    radial-gradient(circle, #10182f 0%, #02030a 75%);
+  border-bottom: 2px solid #343b60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.game-info {
+  padding: 18px;
+}
+
+.game-info h2 {
+  margin: 0 0 8px;
+  color: #ffd84d;
+  letter-spacing: 0.08em;
+}
+
+.game-info p {
+  color: #afb5cf;
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+}
+
+.status {
+  display: block;
+  color: #62ff86;
+  font-size: 0.75rem;
+  margin-bottom: 14px;
+}
+
+.offline {
+  display: block;
+  color: #68708d;
+  font-size: 0.75rem;
+}
+
+.play {
+  display: block;
+  background: #151d39;
+  border: 1px solid #7df9ff;
+  color: #7df9ff;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.pacman {
+  font-family: Arial, sans-serif;
+  color: #ffd84d;
+  font-size: 72px;
+  line-height: 0.8;
+  text-shadow: 0 0 14px rgba(255, 216, 77, 0.7);
+}
+
+.dots {
+  color: white;
+  margin-top: 20px;
+  letter-spacing: 12px;
+}
+
+.aliens {
+  color: #ff5fa2;
+  font-size: 30px;
+  letter-spacing: 10px;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px #ff5fa2;
+}
+
+.ship {
+  color: #7df9ff;
+  font-size: 42px;
+  text-shadow: 0 0 10px #7df9ff;
+}
+
+.coming {
+  opacity: 0.55;
+}
+
+.coming-icon {
+  font-size: 60px;
+  filter: grayscale(0.4);
+}
+
+.platform {
+  margin-top: 35px;
+  border-top: 1px solid #343b60;
+  border-bottom: 1px solid #343b60;
+  padding: 18px 8px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: #7b85a8;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+footer {
+  text-align: center;
+  color: #555d79;
+  margin-top: 22px;
+  font-size: 0.75rem;
+}
+
+.scanlines {
+  position: fixed;
+  pointer-events: none;
+  inset: 0;
+  z-index: 10;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.00) 0,
+      rgba(255,255,255,0.00) 3px,
+      rgba(0,0,0,0.12) 4px
+    );
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insert-coin {
+    animation: none;
+  }
+
+  .game-card {
+    transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 18px 10px;
+  }
+
+  .platform {
+    gap: 8px;
+    flex-direction: column;
+    text-align: center;
+  }
+}

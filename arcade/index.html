@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Arcade</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="scanlines"></div>
+
+  <main class="arcade">
+    <header>
+      <div class="insert-coin">★ INSERT COIN ★</div>
+      <h1>RETRO ARCADE</h1>
+      <p class="subtitle">Powered by Red Hat OpenShift</p>
+    </header>
+
+    <section class="game-grid">
+
+      <a id="pacmanLink" class="game-card playable" href="#">
+        <div class="game-screen pacman-screen">
+          <div class="pacman">●</div>
+          <div class="dots">• • • • •</div>
+        </div>
+
+        <div class="game-info">
+          <h2>PAC-MAN</h2>
+          <p>Classic maze-chase action</p>
+          <span class="status">● ONLINE</span>
+          <span class="play">PLAY NOW</span>
+        </div>
+      </a>
+
+      <a id="starFighterLink" class="game-card playable" href="#">
+        <div class="game-screen fighter-screen">
+          <div class="aliens">▾ ▾ ▾ ▾ ▾</div>
+          <div class="ship">▲</div>
+        </div>
+
+        <div class="game-info">
+          <h2>STAR FIGHTER</h2>
+          <p>Defend the galaxy</p>
+          <span class="status">● ONLINE</span>
+          <span class="play">PLAY NOW</span>
+        </div>
+      </a>
+
+      <div class="game-card coming">
+        <div class="game-screen">
+          <div class="coming-icon">👾</div>
+        </div>
+
+        <div class="game-info">
+          <h2>SPACE INVADERS</h2>
+          <p>Coming soon</p>
+          <span class="offline">○ LOCKED</span>
+        </div>
+      </div>
+
+      <div class="game-card coming">
+        <div class="game-screen">
+          <div class="coming-icon">🏓</div>
+        </div>
+
+        <div class="game-info">
+          <h2>PONG</h2>
+          <p>Coming soon</p>
+          <span class="offline">○ LOCKED</span>
+        </div>
+      </div>
+
+      <div class="game-card coming">
+        <div class="game-screen">
+          <div class="coming-icon">☄</div>
+        </div>
+
+        <div class="game-info">
+          <h2>ASTEROIDS</h2>
+          <p>Coming soon</p>
+          <span class="offline">○ LOCKED</span>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="platform">
+      <div>OPENSHIFT RETRO ARCADE</div>
+      <div id="clusterInfo">retro-arcade namespace</div>
+    </section>
+
+    <footer>
+      Containers • Deployments • Services • Routes
+    </footer>
+  </main>
+
+<script>
+  /*
+   * Our OpenShift Routes follow this pattern:
+   *
+   * arcade-retro-arcade.apps.example.com
+   * pacman-retro-arcade.apps.example.com
+   * star-fighter-retro-arcade.apps.example.com
+   *
+   * Because all three applications use the same ingress domain,
+   * the lobby can automatically calculate the other game URLs.
+   */
+
+  const namespace = 'retro-arcade';
+  const currentHost = window.location.hostname;
+
+  const lobbyPrefix = `arcade-${namespace}.`;
+
+  let ingressDomain = currentHost;
+
+  if (currentHost.startsWith(lobbyPrefix)) {
+    ingressDomain = currentHost.substring(lobbyPrefix.length);
+  }
+
+  function gameRoute(name) {
+    return `${window.location.protocol}//${name}-${namespace}.${ingressDomain}`;
+  }
+
+  document.getElementById('pacmanLink').href =
+    gameRoute('pacman');
+
+  document.getElementById('starFighterLink').href =
+    gameRoute('star-fighter');
+</script>
+
+</body>
+</html>
