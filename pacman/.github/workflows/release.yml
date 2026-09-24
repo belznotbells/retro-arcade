@@ -1,0 +1,149 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (without v prefix), for example 1.4.0"
+        required: true
+        type: string
+      channel:
+        description: "Release channel"
+        required: true
+        type: choice
+        default: stable
+        options:
+          - stable
+          - alpha
+      publish_release:
+        description: "Publish release (unchecked creates a draft)"
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    name: Tag and Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate with lint and unit tests
+        run: npm run check
+
+      - name: Validate semantic version
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semantic version: $VERSION"
+            exit 1
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ "${{ inputs.channel }}" = "alpha" ]; then
+            TAG="alpha-v${{ inputs.version }}"
+            LAST_TAG=$(git tag --list 'alpha-v*' --sort=-version:refname | head -n 1 || true)
+          else
+            TAG="v${{ inputs.version }}"
+            LAST_TAG=$(git tag --list 'v*' --sort=-version:refname | head -n 1 || true)
+          fi
+          RANGE="HEAD"
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..HEAD"
+          fi
+
+          COMMITS=$(git log --pretty=format:'%s|%h' "$RANGE")
+          FEAT=""
+          FIX=""
+          DOCS=""
+          CHORE=""
+
+          while IFS='|' read -r SUBJECT SHA; do
+            if [ -z "$SUBJECT" ]; then
+              continue
+            fi
+            if [[ "$SUBJECT" == feat:* ]]; then
+              FEAT+="- ${SUBJECT#feat: } (${SHA})"$'\n'
+            elif [[ "$SUBJECT" == fix:* ]]; then
+              FIX+="- ${SUBJECT#fix: } (${SHA})"$'\n'
+            elif [[ "$SUBJECT" == docs:* ]]; then
+              DOCS+="- ${SUBJECT#docs: } (${SHA})"$'\n'
+            else
+              CHORE+="- ${SUBJECT} (${SHA})"$'\n'
+            fi
+          done <<< "$COMMITS"
+
+          {
+            echo "# PacMan ${TAG}"
+            echo
+            echo "Channel: **${{ inputs.channel }}**"
+            echo
+            if [ -n "$LAST_TAG" ]; then
+              echo "Changes since ${LAST_TAG}"
+            else
+              echo "Initial release"
+            fi
+            echo
+            echo "## Features"
+            echo "${FEAT:-_No feature commits._}"
+            echo
+            echo "## Fixes"
+            echo "${FIX:-_No fix commits._}"
+            echo
+            echo "## Docs"
+            echo "${DOCS:-_No docs commits._}"
+            echo
+            echo "## Chore & Other"
+            echo "${CHORE:-_No additional commits._}"
+            echo
+            echo "## Rollback Guide"
+            echo "1. Re-deploy previous stable tag."
+            echo "2. Disable current release in distribution channel."
+            echo "3. Verify PWA cache by bumping service-worker cache version in follow-up patch."
+            echo "4. Publish rollback notes referencing the restored tag."
+          } > RELEASE_NOTES.md
+
+      - name: Create and push git tag
+        id: tag
+        run: |
+          if [ "${{ inputs.channel }}" = "alpha" ]; then
+            TAG="alpha-v${{ inputs.version }}"
+          else
+            TAG="v${{ inputs.version }}"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          body_path: RELEASE_NOTES.md
+          prerelease: ${{ inputs.channel == 'alpha' }}
+          draft: ${{ !inputs.publish_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
