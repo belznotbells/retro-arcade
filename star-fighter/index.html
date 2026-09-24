@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Fighter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="cabinet">
+    <header>
+      <h1>STAR FIGHTER</h1>
+      <p class="subtitle">OpenShift Retro Arcade</p>
+    </header>
+
+    <section class="hud" aria-label="Game status">
+      <div>
+        <span class="label">SCORE</span>
+        <span id="score">000000</span>
+      </div>
+
+      <div>
+        <span class="label">LEVEL</span>
+        <span id="level">1</span>
+      </div>
+
+      <div>
+        <span class="label">LIVES</span>
+        <span id="lives">3</span>
+      </div>
+    </section>
+
+    <section class="screen-wrap">
+      <canvas
+        id="game"
+        width="480"
+        height="640"
+        aria-label="Star Fighter arcade game">
+      </canvas>
+
+      <div id="message" class="message">
+        PRESS START
+      </div>
+    </section>
+
+    <button id="startBtn" class="start-button" type="button">
+      Start Game
+    </button>
+
+    <section class="controls" aria-label="Game controls">
+      <button id="leftBtn" type="button" aria-label="Move left">
+        ◀
+      </button>
+
+      <button id="fireBtn" class="fire" type="button" aria-label="Fire">
+        FIRE
+      </button>
+
+      <button id="rightBtn" type="button" aria-label="Move right">
+        ▶
+      </button>
+    </section>
+
+    <p class="keyboard">
+      Keyboard: ← → or A/D to move &nbsp; • &nbsp; SPACE to fire
+    </p>
+
+    <footer>
+      Powered by Red Hat OpenShift
+    </footer>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
